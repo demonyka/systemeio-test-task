@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Product
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
@@ -44,5 +44,19 @@ class Product
     {
         $this->price = $price;
         return $this;
+    }
+
+    public function calculatePrice(TaxRate $taxRate, ?Coupon $coupon = null): float
+    {
+        $price = $this->price;
+
+        if ($coupon) {
+            $price = $coupon->applyCoupon($price);
+        }
+
+        // Применяем налог
+        $price = $taxRate->applyTax($price);
+
+        return max($price, 0);
     }
 }

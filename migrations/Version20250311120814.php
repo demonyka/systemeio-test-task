@@ -19,20 +19,41 @@ final class Version20250311120814 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
+        // Создаем последовательности для автоинкремента
         $this->addSql('CREATE SEQUENCE product_coupons_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE products_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE tax_rates_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE product_coupons (id INT NOT NULL, code VARCHAR(255) NOT NULL, value DOUBLE PRECISION NOT NULL, type VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE products (id INT NOT NULL, name VARCHAR(255) NOT NULL, price DOUBLE PRECISION NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE tax_rates (id INT NOT NULL, country_code VARCHAR(2) NOT NULL, rate DOUBLE PRECISION NOT NULL, PRIMARY KEY(id))');
+
+        // Создаем таблицы с автоинкрементом для id
+        $this->addSql('CREATE TABLE product_coupons (
+            id INT NOT NULL DEFAULT nextval(\'product_coupons_id_seq\'),
+            code VARCHAR(255) NOT NULL,
+            discount DOUBLE PRECISION NOT NULL,
+            type VARCHAR(255) NOT NULL,
+            PRIMARY KEY(id)
+        )');
+
+        $this->addSql('CREATE TABLE products (
+            id INT NOT NULL DEFAULT nextval(\'products_id_seq\'),
+            name VARCHAR(255) NOT NULL,
+            price DOUBLE PRECISION NOT NULL,
+            PRIMARY KEY(id)
+        )');
+
+        $this->addSql('CREATE TABLE tax_rates (
+            id INT NOT NULL DEFAULT nextval(\'tax_rates_id_seq\'),
+            country_code VARCHAR(2) NOT NULL,
+            rate DOUBLE PRECISION NOT NULL,
+            PRIMARY KEY(id)
+        )');
+
+        // Индекс для tax_rates
         $this->addSql('CREATE UNIQUE INDEX UNIQ_F7AE5E1DF026BB7C ON tax_rates (country_code)');
     }
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SCHEMA public');
+        // Откатываем миграцию, удаляя все таблицы и последовательности
         $this->addSql('DROP SEQUENCE product_coupons_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE products_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE tax_rates_id_seq CASCADE');
