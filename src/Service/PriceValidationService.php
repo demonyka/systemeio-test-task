@@ -5,49 +5,61 @@ namespace App\Service;
 use App\Repository\ProductRepository;
 use App\Repository\TaxRateRepository;
 use App\Repository\CouponRepository;
+use App\DTO\PriceValidationDTO;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PriceValidationService
 {
     private ProductRepository $productRepository;
     private TaxRateRepository $taxRateRepository;
     private CouponRepository $couponRepository;
+    private ValidatorInterface $validator;
 
     public function __construct(
         ProductRepository $productRepository,
         TaxRateRepository $taxRateRepository,
-        CouponRepository $couponRepository
+        CouponRepository $couponRepository,
+        ValidatorInterface $validator
     ) {
         $this->productRepository = $productRepository;
         $this->taxRateRepository = $taxRateRepository;
         $this->couponRepository = $couponRepository;
+        $this->validator = $validator;
     }
 
     public function validate(array $data): array|JsonResponse
     {
-        if (!isset($data['product']) || !is_int($data['product'])) {
-            return new JsonResponse(['error' => 'Product ID is required and must be an integer.'], 400);
+        $dto = new PriceValidationDTO();
+        $dto->product = $data['product'] ?? null;
+        $dto->TaxNumber = $data['TaxNumber'] ?? null;
+        $dto->couponCode = $data['couponCode'] ?? null;
+
+        $errors = $this->validator->validate($dto);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], 422);
         }
 
-        $product = $this->productRepository->find($data['product']);
+        $product = $this->productRepository->find($dto->product);
         if (!$product) {
-            return new JsonResponse(['error' => 'Product not found.'], 400);
+            return new JsonResponse(['error' => 'Product not found.'], 422);
         }
 
-        if (empty($data['TaxNumber'])) {
-            return new JsonResponse(['error' => 'TaxNumber is required.'], 400);
-        }
-
-        $taxRate = $this->taxRateRepository->findRateByTaxNumber($data['TaxNumber']);
+        $taxRate = $this->taxRateRepository->findRateByTaxNumber($dto->TaxNumber);
         if (!$taxRate) {
-            return new JsonResponse(['error' => 'Tax rate not found.'], 400);
+            return new JsonResponse(['error' => 'Tax rate not found.'], 422);
         }
 
         $coupon = null;
-        if (!empty($data['couponCode'])) {
-            $coupon = $this->couponRepository->findOneBy(['code' => $data['couponCode']]);
+        if ($dto->couponCode) {
+            $coupon = $this->couponRepository->findOneBy(['code' => $dto->couponCode]);
             if (!$coupon) {
-                return new JsonResponse(['error' => 'Invalid coupon code.'], 400);
+                return new JsonResponse(['error' => 'Invalid coupon code.'], 422);
             }
         }
 

@@ -27,6 +27,14 @@ class PriceCalculatorController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return new JsonResponse(['error' => 'Invalid JSON format.'], 400);
+        }
+
+        if (empty($data)) {
+            return new JsonResponse(['error' => 'No data provided.'], 400);
+        }
+
         $validationResult = $this->priceValidation->validate($data);
         if ($validationResult instanceof JsonResponse) {
             return $validationResult;
