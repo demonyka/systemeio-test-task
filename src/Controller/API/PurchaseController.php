@@ -1,12 +1,13 @@
 <?php
-
 namespace App\Controller\API;
 
+use App\Service\Payment\PaymentProcessorFactory;
 use App\Service\Product\PriceCalculatorService;
 use App\Service\Product\Validation\PurchaseValidationService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use RuntimeException;
 
 class PurchaseController extends BaseAPIController
 {
@@ -16,8 +17,7 @@ class PurchaseController extends BaseAPIController
     public function __construct(
         PurchaseValidationService $validationService,
         PriceCalculatorService $calculatorService,
-    )
-    {
+    ) {
         $this->validationService = $validationService;
         $this->calculatorService = $calculatorService;
     }
@@ -42,11 +42,21 @@ class PurchaseController extends BaseAPIController
             'product' => $product,
             'taxRate' => $taxRate,
             'coupon' => $coupon,
-            'paymentProcessor' => $paymentProcessor
+            'paymentProcessor' => $paymentProcessorName
         ] = $validationResult;
 
         $price = $this->calculatorService->calculate($product, $taxRate, $coupon);
 
-        return $this->json([]);
+
+        try {
+            $processor = PaymentProcessorFactory::create($paymentProcessorName);
+            $processor->processPayment($price);
+        } catch (RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['error' => 'Неизвестный процессор: ' . $e->getMessage()], 400);
+        }
+
+        return $this->json(['message' => 'Покупка успешно оформлена']);
     }
 }
