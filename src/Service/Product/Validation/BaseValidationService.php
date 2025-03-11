@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Product\Validation;
 
+use App\Repository\CouponRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TaxRateRepository;
-use App\Repository\CouponRepository;
-use App\DTO\PriceValidationDTO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PriceValidationService
+abstract class BaseValidationService
 {
-    private ProductRepository $productRepository;
-    private TaxRateRepository $taxRateRepository;
-    private CouponRepository $couponRepository;
-    private ValidatorInterface $validator;
+    protected ProductRepository $productRepository;
+    protected TaxRateRepository $taxRateRepository;
+    protected CouponRepository $couponRepository;
+    protected ValidatorInterface $validator;
 
     public function __construct(
         ProductRepository $productRepository,
@@ -28,13 +27,8 @@ class PriceValidationService
         $this->validator = $validator;
     }
 
-    public function validate(array $data): array|JsonResponse
+    protected function validateCommonData($dto): array|JsonResponse
     {
-        $dto = new PriceValidationDTO();
-        $dto->product = $data['product'] ?? null;
-        $dto->TaxNumber = $data['TaxNumber'] ?? null;
-        $dto->couponCode = $data['couponCode'] ?? null;
-
         $errors = $this->validator->validate($dto);
 
         if (count($errors) > 0) {
