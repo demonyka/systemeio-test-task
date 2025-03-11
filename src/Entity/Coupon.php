@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: 'App\Repository\CouponRepository')]
 #[ORM\Table(name: "product_coupons")]
 class Coupon
 {
