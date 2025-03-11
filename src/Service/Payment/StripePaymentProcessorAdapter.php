@@ -8,9 +8,9 @@ class StripePaymentProcessorAdapter implements PaymentProcessorInterface
 {
     private StripePaymentProcessor $stripe;
 
-    public function __construct(StripePaymentProcessor $stripe)
+    public function __construct()
     {
-        $this->stripe = $stripe;
+        $this->stripe = new StripePaymentProcessor();
     }
 
     public function processPayment(float $price): bool

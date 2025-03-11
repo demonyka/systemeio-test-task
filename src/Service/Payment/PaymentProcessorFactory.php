@@ -2,9 +2,6 @@
 
 namespace App\Service\Payment;
 
-use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
-use Systemeio\TestForCandidates\PaymentProcessor\StripePaymentProcessor;
-
 class PaymentProcessorFactory
 {
     /**
@@ -17,8 +14,8 @@ class PaymentProcessorFactory
     public static function create(string $processorName): PaymentProcessorInterface
     {
         return match (strtolower($processorName)) {
-            'paypal' => new PaypalPaymentProcessorAdapter(new PaypalPaymentProcessor()),
-            'stripe' => new StripePaymentProcessorAdapter(new StripePaymentProcessor()),
+            'paypal' => new PaypalPaymentProcessorAdapter(),
+            'stripe' => new StripePaymentProcessorAdapter(),
             default => throw new \InvalidArgumentException("Неизвестный процессор: {$processorName}"),
         };
     }

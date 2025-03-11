@@ -9,9 +9,9 @@ class PaypalPaymentProcessorAdapter implements PaymentProcessorInterface
 {
     private PaypalPaymentProcessor $paypal;
 
-    public function __construct(PaypalPaymentProcessor $paypal)
+    public function __construct()
     {
-        $this->paypal = $paypal;
+        $this->paypal = new PaypalPaymentProcessor();
     }
 
     public function processPayment(float $price): bool

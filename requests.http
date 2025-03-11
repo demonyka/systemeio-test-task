@@ -1,22 +1,22 @@
-### Calculate Price
+### Calculate Price (IPhone for 100 euros - 10% Discount + 19% Tax = 107.1 Euro) Вот бы мне айфон за 107 евро :(
 POST http://127.0.0.1:8337/calculate-price
 Accept: application/json
 Content-Type: application/json
 
 {
   "product": 1,
-  "taxNumber": "DE123456789",
-  "couponCode": "D15"
+  "TaxNumber": "DE123456789",
+  "couponCode": "P10"
 }
 
-### Execute Purchase
+### Execute Purchase headphones 20 euro - 10% Discount + 22% Tax = 21.96 Euro
 POST http://127.0.0.1:8337/purchase
 Accept: application/json
 Content-Type: application/json
 
 {
-  "product": 1,
-  "taxNumber": "IT12345678900",
-  "couponCode": "D15",
-  "paymentProcessor": "paypal"
+    "product": 2,
+    "TaxNumber": "IT12345678900",
+    "couponCode": "P10",
+    "paymentProcessor": "paypal"
 }

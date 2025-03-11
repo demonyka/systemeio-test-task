@@ -1,3 +1,17 @@
+# Установка
+```bash
+  cp .env.example .env
+```
+```bash
+  docker-compose up -d --build
+```
+```bash
+  php bin/console doctrine:migrations:migrate
+```
+
+### С миграциями сразу добавятся дефолтные продукты, купоны и налоговые ставки
+
+
 # Написать Symfony REST-приложение для расчета цены продукта и проведения оплаты
 
 Необходимо реализовать 2 эндпоинта:
