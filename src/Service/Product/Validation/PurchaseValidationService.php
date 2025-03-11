@@ -15,6 +15,14 @@ class PurchaseValidationService extends BaseValidationService
         $dto->couponCode = $data['couponCode'] ?? null;
         $dto->paymentProcessor = $data['paymentProcessor'] ?? null;
 
-        return $this->validateCommonData($dto);
+        $result = $this->validateCommonData($dto);
+
+        if ($result instanceof JsonResponse) {
+            return $result;
+        }
+
+        $result['paymentProcessor'] = $dto->paymentProcessor;
+
+        return $result;
     }
 }

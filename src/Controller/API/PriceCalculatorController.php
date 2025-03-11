@@ -36,8 +36,10 @@ class PriceCalculatorController extends BaseApiController
 
         ['product' => $product, 'taxRate' => $taxRate, 'coupon' => $coupon] = $validationResult;
 
-        $response = $this->calculatorService->calculate($product, $taxRate, $coupon);
+        $price = $this->calculatorService->calculate($product, $taxRate, $coupon);
 
-        return $this->json($response);
+        return $this->json([
+            'price' => $price,
+        ]);
     }
 }
