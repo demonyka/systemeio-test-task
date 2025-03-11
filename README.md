@@ -24,7 +24,7 @@ http://127.0.0.1:8337/calculate-price
 {
     "product": 1,
     "taxNumber": "DE123456789",
-    "couponCode": "D15"
+    "couponCode": "P10"
 }
 ```
 2. POST: для осуществления покупки
@@ -36,7 +36,7 @@ http://127.0.0.1:8337/purchase
 {
     "product": 1,
     "taxNumber": "IT12345678900",
-    "couponCode": "D15",
+    "couponCode": "P100",
     "paymentProcessor": "paypal"
 }
 ```
